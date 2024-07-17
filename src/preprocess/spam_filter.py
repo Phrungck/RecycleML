@@ -3,13 +3,28 @@ import pandas as pd
 
 from src.utils.unzip import unzip_no_pass
 
-# create dataframe from spam filtering dataset
 def create_dataframe(path_to_zip, 
                      out_path="./data/spam_filter", 
                      unzip=False,
                      save_ext="csv"
                     ):
+    '''
+    This creates a dataframe from spam filtering dataset.
     
+    Args:
+        path_to_zip:
+            (str) path to zip file.
+        out_path:
+            (str) path to store processed data.
+        unzip:
+            (bool) whether to unzip files before processing. Default False.
+        save_ext:
+            (str) file extension of saved data. Choices: csv, parquet.
+            Default csv.
+    
+    Returns:
+        None
+    '''
     assert save_ext in ["csv", "parquet"], "Extensions allowed are csv and parquet."
     
     path_to_zip = os.path.normpath(path_to_zip)
