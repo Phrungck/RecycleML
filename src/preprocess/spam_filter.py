@@ -46,6 +46,6 @@ def create_dataframe(path_to_zip,
     df = df.rename(columns = {0 : "Class", 2 : "Folder", 3: "File"}) # rename
     
     if save_ext == "csv":
-        df.to_csv(os.path.join(out_path, f"{filename}.{save_ext}"))
+        df.to_csv(os.path.join(out_path, f"{filename}.{save_ext}"), index=False)
     elif save_ext == "parquet":
         df.to_parquet(os.path.join(out_path, f"{filename}.{save_ext}"))
