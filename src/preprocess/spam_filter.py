@@ -3,28 +3,13 @@ import pandas as pd
 
 from src.utils.unzip import unzip_no_pass
 
+# create dataframe from spam filtering dataset
 def create_dataframe(path_to_zip, 
                      out_path="./data/spam_filter", 
                      unzip=False,
                      save_ext="csv"
                     ):
-    '''
-    This creates a dataframe from spam filtering dataset.
     
-    Args:
-        path_to_zip:
-            (str) path to zip file.
-        out_path:
-            (str) path to store processed data.
-        unzip:
-            (bool) whether to unzip files before processing. Default False.
-        save_ext:
-            (str) file extension of saved data. Choices: csv, parquet.
-            Default csv.
-    
-    Returns:
-        None
-    '''
     assert save_ext in ["csv", "parquet"], "Extensions allowed are csv and parquet."
     
     path_to_zip = os.path.normpath(path_to_zip)
@@ -45,6 +30,21 @@ def create_dataframe(path_to_zip,
     df = df.drop(columns=1) # drop unnecessary column
     df = df.rename(columns = {0 : "Class", 2 : "Folder", 3: "File"}) # rename
     
+    # replace spam and ham values
+    df["Class"] = df["Class"].replace({"ham" : 0, "spam" : 1})
+    
+    # combine with text / email data
+    for i in range(len(df)):
+        folder_id = "{0:0=3d}".format(df.at[i,'Folder'])
+        file_id = "{0:0=3d}".format(df.at[i,'File'])
+        
+        path = os.path.normpath(os.path.join(out_path, filename, "data", folder_id, file_id))
+        
+        # there will be an error if utf-8 is used as encoding
+        df.at[i, "Email"] = open(path, encoding="latin1").read()
+        
+    df["Email"] = df["Email"].str.lower()
+
     if save_ext == "csv":
         df.to_csv(os.path.join(out_path, f"{filename}.{save_ext}"), index=False)
     elif save_ext == "parquet":
