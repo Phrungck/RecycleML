@@ -45,6 +45,21 @@ def create_dataframe(path_to_zip,
     df = df.drop(columns=1) # drop unnecessary column
     df = df.rename(columns = {0 : "Class", 2 : "Folder", 3: "File"}) # rename
     
+    # replace spam and ham values
+    df["Class"] = df["Class"].replace({"ham" : 0, "spam" : 1})
+    
+    # combine with text / email data
+    for i in range(len(df)):
+        folder_id = "{0:0=3d}".format(df.at[i,'Folder'])
+        file_id = "{0:0=3d}".format(df.at[i,'File'])
+        
+        path = os.path.normpath(os.path.join(out_path, filename, "data", folder_id, file_id))
+        
+        # there will be an error if utf-8 is used as encoding
+        df.at[i, "Email"] = open(path, encoding="latin1").read()
+        
+    df["Email"] = df["Email"].str.lower()
+
     if save_ext == "csv":
         df.to_csv(os.path.join(out_path, f"{filename}.{save_ext}"), index=False)
     elif save_ext == "parquet":
